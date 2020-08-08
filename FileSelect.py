@@ -1,29 +1,47 @@
 # Imports
-import shutil, os, random
+import shutil, os, random, re
 
 # Variables & Arrays
 picFileExten = [".JPG", ".PNG"]
-
+getDir = []
 
 # Main
-getDir = input("Please Enter a Directory to Get Images From: ")
+try:
+    readFile = open("Directorys.txt", "r")
+    fileCont = readFile.readlines()
+    # Remove \n
+    for E in fileCont:
+        E = re.sub('\\n', '', E)
+        if E != ' ' or E != '':
+            getDir.append(E)
+
+    if len(getDir) < 1:
+        getDir.append(input("Please Enter a Directory to Get Images From: "))
+except FileNotFoundError:
+    getDir.append(input("Please Enter a Directory to Get Images From: "))
+
+
 placeDir = input("Please Enter a Directory to Place Images: ")
+
 
 total, used, free = shutil.disk_usage(placeDir)
 full = total * 0.7
 
-print("\nGETTING PICTURES FROM: " + getDir)
+print("")
+
 files = []
 totalFileSpace = 0
-for root, subfolders, filenames in os.walk(getDir):
-    for file in filenames:
-        filename, fileExtension = os.path.splitext(file)
-        if fileExtension.upper() in picFileExten:
-            totalFileSpace += os.path.getsize(root + "\\" + file)
-            files.append(root + "\\" + file)
+for direct in getDir:
+    print("GETTING PICTURES FROM: " + direct)
+    for root, subfolders, filenames in os.walk(direct):
+        for file in filenames:
+            filename, fileExtension = os.path.splitext(file)
+            if fileExtension.upper() in picFileExten:
+                totalFileSpace += os.path.getsize(root + "\\" + file)
+                files.append(root + "\\" + file)
+
 
 print("GOT PICTURES\n\nCHOSING & COPYING PICTURES")
-
 if totalFileSpace < free and totalFileSpace < full:
     num = 1
     for file in files:
